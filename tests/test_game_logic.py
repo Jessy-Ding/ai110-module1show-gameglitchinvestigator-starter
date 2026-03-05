@@ -264,49 +264,41 @@ def test_all_original_bugs_are_fixed():
 
 
 def test_score_never_goes_negative():
-    """Test that score system never allows negative values and uses new scoring logic"""
+    """Test that score never goes below 0"""
     from logic_utils import update_score
     
-    # Start with base score (new system starts with 50)
-    score = 50
-    
-    # Make many bad guesses (each -5 points, but not below 0)
-    for i in range(1, 15):  # More than enough to test the 0 floor
+    # Wrong guesses don't change score (stays at 0)
+    score = 0
+    for i in range(1, 15):
         score = update_score(score, "Too Low", i)
         assert score >= 0, f"Score became negative ({score}) after attempt {i}"
     
-    # Score should be 0, not negative
-    assert score == 0, f"Expected score to be 0, got {score}"
+    assert score == 0, f"Expected score to be 0 during game, got {score}"
     
-    # Test that positive scoring still works with new system
-    score = 50  # Start fresh
-    
-    # Test error deduction
-    score = update_score(score, "Too High", 1)  # Should be 45
-    assert score == 45, f"Expected 45 after error, got {score}"
-    
-    # Test win bonus  
-    score = update_score(score, "Win", 2)  # Should get base 50 + (8-2)*15 = 50+90 = 140 bonus
-    expected_win_total = 45 + 50 + (8-2)*15  # current + base + remaining*15
-    assert score == expected_win_total, f"Expected {expected_win_total} after win, got {score}"
+    # Win very late should be 0, not negative
+    late_win = update_score(0, "Win", 11)  # 100 - 100 = 0
+    assert late_win == 0, f"Score should be 0 floor, got {late_win}"
 
 
 def test_new_scoring_system():
-    """Test the new simplified scoring system"""
+    """Test the 0-100 scoring system"""
     from logic_utils import update_score
     
-    # Test consistent error deduction (no more odd/even nonsense)
-    score = 50
+    # Wrong guesses don't change the score
+    score = 0
     score = update_score(score, "Too High", 1)
-    assert score == 45, "Too High should deduct 5 points"
+    assert score == 0, "Wrong guess should not change score"
     
-    score = update_score(score, "Too Low", 2) 
-    assert score == 40, "Too Low should also deduct 5 points"
+    score = update_score(score, "Too Low", 2)
+    assert score == 0, "Wrong guess should not change score"
     
-    # Test win bonuses scale with remaining attempts
-    quick_win = update_score(50, "Win", 1)  # 7 remaining attempts
-    slow_win = update_score(50, "Win", 5)   # 3 remaining attempts
-    assert quick_win > slow_win, "Quicker wins should get higher scores"
+    # Win scores scale with attempts used
+    assert update_score(0, "Win", 1) == 100, "Win on attempt 1 = 100"
+    assert update_score(0, "Win", 4) == 70,  "Win on attempt 4 = 70"
+    assert update_score(0, "Win", 8) == 30,  "Win on attempt 8 = 30"
+    
+    # Quicker wins score higher
+    assert update_score(0, "Win", 1) > update_score(0, "Win", 5), "Quicker wins should score higher"
 
 
 def main():

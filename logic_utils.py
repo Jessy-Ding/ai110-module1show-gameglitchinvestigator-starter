@@ -61,21 +61,15 @@ def check_guess(guess, secret):
 
 def update_score(current_score: int, outcome: str, attempt_number: int):
     """
-    Improved scoring system:
-    - Start with 50 points
-    - Wrong guesses deduct 5 points (minimum 0)
-    - Win bonus based on remaining attempts
+    Scoring system (0-100):
+    - Win on attempt 1: 100 points
+    - Each additional attempt: -10 points
+    - Loss: 0 points
     """
     if outcome == "Win":
-        # Win bonus: base 50 points + remaining attempts × 15 points
-        # Assumes Normal difficulty for simplicity (8 attempts total)
-        remaining = 8 - attempt_number
-        win_bonus = 50 + remaining * 15
-        return current_score + win_bonus
+        return max(0, 100 - (attempt_number - 1) * 10)
 
-    # Wrong guesses uniformly deduct 5 points, no distinction between Too High/Too Low
     if outcome in ["Too High", "Too Low"]:
-        new_score = current_score - 5
-        return max(0, new_score)
+        return current_score  # Score unchanged during game, only finalized on win
 
     return current_score
