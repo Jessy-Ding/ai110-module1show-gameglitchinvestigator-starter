@@ -267,33 +267,33 @@ def test_score_never_goes_negative():
     """Test that score never goes below 0"""
     from logic_utils import update_score
     
-    score = 0
+    score = 50
     for i in range(1, 15):
-        score = update_score(score, "Too Low", i, attempt_limit=8)
+        score = update_score(score, "Too Low", i)
         assert score >= 0, f"Score became negative ({score}) after attempt {i}"
-    
-    late_win = update_score(0, "Win", 11, attempt_limit=11)
-    assert late_win >= 0, f"Score should not be negative, got {late_win}"
 
 
 def test_new_scoring_system():
-    """Test the 0-100 scoring system scaled per difficulty"""
+    """Test the 0-100 scoring system: start 50, -5 per wrong, +50 win bonus"""
     from logic_utils import update_score
     
-    # Win on attempt 1 always gives 100 regardless of difficulty
-    assert update_score(0, "Win", 1, attempt_limit=6)  == 100, "Easy win attempt 1 = 100"
-    assert update_score(0, "Win", 1, attempt_limit=8)  == 100, "Normal win attempt 1 = 100"
-    assert update_score(0, "Win", 1, attempt_limit=11) == 100, "Hard win attempt 1 = 100"
+    # Wrong guesses deduct 5 each
+    score = 50
+    score = update_score(score, "Too High", 1)
+    assert score == 45, f"After 1 wrong: expected 45, got {score}"
+    score = update_score(score, "Too Low", 2)
+    assert score == 40, f"After 2 wrong: expected 40, got {score}"
     
-    # Win on last attempt always gives ~10 points
-    assert update_score(0, "Win", 6,  attempt_limit=6)  == 10, "Easy win last attempt = 10"
-    assert update_score(0, "Win", 11, attempt_limit=11) == 10, "Hard win last attempt = 10"
+    # Win gives +50 bonus (capped at 100)
+    assert update_score(50, "Win", 1) == 100, "Win with no wrong guesses = 100"
+    assert update_score(45, "Win", 2) == 95,  "Win after 1 wrong = 95"
+    assert update_score(30, "Win", 5) == 80,  "Win after 4 wrong = 80"
     
-    # Quicker wins score higher (same difficulty)
-    assert update_score(0, "Win", 1, attempt_limit=8) > update_score(0, "Win", 5, attempt_limit=8), "Quicker wins score higher"
+    # Loss: score stays wherever it dropped (no bonus)
+    assert update_score(20, "Too High", 8) == 15, "Loss scenario - score just drops"
     
-    # Wrong guess shows countdown potential score
-    assert update_score(0, "Too High", 1, attempt_limit=8) == 88, "Normal after attempt 1 wrong: 88"
+    # Score floor at 0
+    assert update_score(2, "Too Low", 1) == 0, "Score floor is 0"
 
 
 def test_decimal_input_is_accepted():

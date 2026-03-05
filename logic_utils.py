@@ -61,19 +61,19 @@ def check_guess(guess, secret):
 
 def update_score(current_score: int, outcome: str, attempt_number: int, attempt_limit: int = 8):
     """
-    Scoring system (0-100), scaled per difficulty:
-    - Win on attempt 1: always 100 points
-    - Win on last attempt: always ~10 points
-    - Step size = 90 // (attempt_limit - 1)
-    - During game: shows potential score if you win next attempt
-    """
-    step = 90 // (attempt_limit - 1)
+    Scoring system (0-100):
+    - Start at 50 points
+    - Each wrong guess: -5 (floor 0), visible during game
+    - Win: current_score + 50 bonus (always rewards winning)
+    - Loss: keeps current score (reflects damage from wrong guesses)
 
+    Win range:  65-100 (fewer wrong guesses = higher win score)
+    Loss range: 0-45
+    """
     if outcome == "Win":
-        return max(10, 100 - (attempt_number - 1) * step)
+        return min(100, current_score + 50)
 
     if outcome in ["Too High", "Too Low"]:
-        # Show potential score for next attempt (countdown feedback)
-        return max(0, 100 - attempt_number * step)
+        return max(0, current_score - 5)
 
     return current_score

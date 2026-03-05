@@ -35,7 +35,7 @@ if "secret" not in st.session_state:
 if "attempts" not in st.session_state:
     st.session_state.attempts = 0
 if "score" not in st.session_state:
-    st.session_state.score = 0  # Score finalized on win (0-100)
+    st.session_state.score = 50  # Start at 50
 if "status" not in st.session_state:
     st.session_state.status = "playing"
 if "history" not in st.session_state:
@@ -48,7 +48,7 @@ if st.session_state.current_difficulty != difficulty:
     st.session_state.current_difficulty = difficulty
     st.session_state.secret = random.randint(low, high)
     st.session_state.attempts = 0
-    st.session_state.score = 0  # Reset score
+    st.session_state.score = 50  # Reset to 50
     st.session_state.status = "playing"
     st.session_state.history = []
     st.session_state.current_hint = ""
@@ -88,7 +88,7 @@ if new_game:
     st.session_state.secret = random.randint(low, high)
     st.session_state.status = "playing"
     st.session_state.history = []
-    st.session_state.score = 0  # Reset score
+    st.session_state.score = 50  # Reset to 50
     st.session_state.current_hint = ""
     st.success("New game started.")
     st.rerun()
@@ -135,7 +135,6 @@ if submit:
             current_score=st.session_state.score,
             outcome=outcome,
             attempt_number=st.session_state.attempts,
-            attempt_limit=attempt_limit,
         )
 
         if outcome == "Win":
