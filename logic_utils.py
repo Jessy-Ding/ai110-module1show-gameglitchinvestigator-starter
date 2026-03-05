@@ -59,19 +59,21 @@ def check_guess(guess, secret):
         return "Too Low", "📉 Go HIGHER!"
 
 
-def update_score(current_score: int, outcome: str, attempt_number: int):
+def update_score(current_score: int, outcome: str, attempt_number: int, attempt_limit: int = 8):
     """
-    Scoring system (0-100):
-    - Win on attempt 1: 100 points
-    - Each additional attempt: -10 points
-    - Loss: 0 points
-    - During game: shows potential score if won on next attempt
+    Scoring system (0-100), scaled per difficulty:
+    - Win on attempt 1: always 100 points
+    - Win on last attempt: always ~10 points
+    - Step size = 90 // (attempt_limit - 1)
+    - During game: shows potential score if you win next attempt
     """
+    step = 90 // (attempt_limit - 1)
+
     if outcome == "Win":
-        return max(0, 100 - (attempt_number - 1) * 10)
+        return max(10, 100 - (attempt_number - 1) * step)
 
     if outcome in ["Too High", "Too Low"]:
-        # Show potential score for next attempt (counts down to give live feedback)
-        return max(0, 100 - attempt_number * 10)
+        # Show potential score for next attempt (countdown feedback)
+        return max(0, 100 - attempt_number * step)
 
     return current_score

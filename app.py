@@ -18,7 +18,7 @@ difficulty = st.sidebar.selectbox(
 attempt_limit_map = {
     "Easy": 6,
     "Normal": 8,
-    "Hard": 5,
+    "Hard": 11,
 }
 attempt_limit = attempt_limit_map[difficulty]
 
@@ -135,6 +135,7 @@ if submit:
             current_score=st.session_state.score,
             outcome=outcome,
             attempt_number=st.session_state.attempts,
+            attempt_limit=attempt_limit,
         )
 
         if outcome == "Win":
