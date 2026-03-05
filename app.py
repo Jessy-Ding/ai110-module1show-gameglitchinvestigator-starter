@@ -33,7 +33,7 @@ if "current_difficulty" not in st.session_state:
 if "secret" not in st.session_state:
     st.session_state.secret = random.randint(low, high)
 if "attempts" not in st.session_state:
-    st.session_state.attempts = 1
+    st.session_state.attempts = 0
 if "score" not in st.session_state:
     st.session_state.score = 0
 if "status" not in st.session_state:
@@ -45,7 +45,7 @@ if "history" not in st.session_state:
 if st.session_state.current_difficulty != difficulty:
     st.session_state.current_difficulty = difficulty
     st.session_state.secret = random.randint(low, high)
-    st.session_state.attempts = 1
+    st.session_state.attempts = 0
     st.session_state.score = 0
     st.session_state.status = "playing"
     st.session_state.history = []
@@ -78,7 +78,7 @@ with col3:
     show_hint = st.checkbox("Show hint", value=True)
 
 if new_game:
-    st.session_state.attempts = 1
+    st.session_state.attempts = 0
     st.session_state.secret = random.randint(low, high)
     st.session_state.status = "playing"
     st.session_state.history = []
@@ -95,14 +95,13 @@ if st.session_state.status != "playing":
 
 
 if submit:
-    st.session_state.attempts += 1
-
     ok, guess_int, err = parse_guess(raw_guess, low, high)
 
     if not ok:
         st.session_state.history.append(raw_guess)
         st.error(err)
     else:
+        st.session_state.attempts += 1
         st.session_state.history.append(guess_int)
 
         secret = st.session_state.secret
