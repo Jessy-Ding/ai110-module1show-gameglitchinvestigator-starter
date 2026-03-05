@@ -51,7 +51,7 @@ This is a number guessing game built with Streamlit. The player selects a diffic
 
 ## 📸 Demo
 
-![alt text](image.png)
+![winning test on normal level](winning_normal_test.png)
 
 ## 🚀 Stretch Features
 
