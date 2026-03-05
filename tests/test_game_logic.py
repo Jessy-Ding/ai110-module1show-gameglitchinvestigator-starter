@@ -301,6 +301,25 @@ def test_new_scoring_system():
     assert update_score(0, "Win", 1) > update_score(0, "Win", 5), "Quicker wins should score higher"
 
 
+def test_decimal_input_is_accepted():
+    """Test that decimal inputs are converted to int (e.g. 12.5 -> 12)"""
+    ok, value, err = parse_guess("12.5", 1, 100)
+    assert ok == True, f"Decimal input should be accepted, got error: {err}"
+    assert value == 12, f"12.5 should convert to 12, got {value}"
+
+    ok, value, err = parse_guess("99.9", 1, 100)
+    assert ok == True, f"Decimal input should be accepted, got error: {err}"
+    assert value == 99, f"99.9 should convert to 99, got {value}"
+
+
+def test_difficulty_ranges():
+    """Test that all difficulty levels return correct ranges"""
+    from logic_utils import get_range_for_difficulty
+    assert get_range_for_difficulty("Easy")   == (1, 20),   "Easy should be 1-20"
+    assert get_range_for_difficulty("Normal") == (1, 100),  "Normal should be 1-100"
+    assert get_range_for_difficulty("Hard")   == (1, 1000), "Hard should be 1-1000"
+
+
 def main():
     """
     Standalone test runner with nice formatting.
@@ -342,6 +361,10 @@ def main():
         ("Score System Fix", [
             test_score_never_goes_negative,
             test_new_scoring_system,
+        ]),
+        ("Input & Difficulty", [
+            test_decimal_input_is_accepted,
+            test_difficulty_ranges,
         ]),
     ]
     
