@@ -35,7 +35,7 @@ if "secret" not in st.session_state:
 if "attempts" not in st.session_state:
     st.session_state.attempts = 0
 if "score" not in st.session_state:
-    st.session_state.score = 0
+    st.session_state.score = 50  # Start with 50 points to match new scoring system
 if "status" not in st.session_state:
     st.session_state.status = "playing"
 if "history" not in st.session_state:
@@ -46,7 +46,7 @@ if st.session_state.current_difficulty != difficulty:
     st.session_state.current_difficulty = difficulty
     st.session_state.secret = random.randint(low, high)
     st.session_state.attempts = 0
-    st.session_state.score = 0
+    st.session_state.score = 50  # Reset to 50 points at start
     st.session_state.status = "playing"
     st.session_state.history = []
 
@@ -56,6 +56,13 @@ st.info(
     f"Guess a number between {low} and {high}. "
     f"Attempts left: {attempt_limit - st.session_state.attempts}"
 )
+
+with st.expander("Developer Debug Info"):
+    st.write("Secret:", st.session_state.secret)
+    st.write("Attempts:", st.session_state.attempts)
+    st.write("Score:", st.session_state.score)
+    st.write("Difficulty:", difficulty)
+    st.write("History:", st.session_state.history)
 
 raw_guess = st.text_input(
     "Enter your guess:",
@@ -75,7 +82,7 @@ if new_game:
     st.session_state.secret = random.randint(low, high)
     st.session_state.status = "playing"
     st.session_state.history = []
-    st.session_state.score = 0
+    st.session_state.score = 50  # Reset to 50 points at start
     st.success("New game started.")
     st.rerun()
 
@@ -128,13 +135,4 @@ if submit:
                 )
 
 st.divider()
-
-# Debug panel moved here so it shows current state after any updates
-with st.expander("Developer Debug Info"):
-    st.write("Secret:", st.session_state.secret)
-    st.write("Attempts:", st.session_state.attempts)
-    st.write("Score:", st.session_state.score)
-    st.write("Difficulty:", difficulty)
-    st.write("History:", st.session_state.history)
-
 st.caption("Built by an AI that claims this code is production-ready.")
