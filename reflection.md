@@ -27,9 +27,9 @@ Answer:
 Answer: 
 - Claude Sonnet 4.5-4.6
 
-- One correct example by AI: I told AI that I found from the result website that the current code does not check if the entered number is valid or not and it helped me correct it. I asked AI to first point out why and where the current code went wrong, and it gave me the correct answer. By the rule of TDD, I asked for the testing code, and it passed all the tests. Finally, I checked the website with edge and wrong cases, and it worked out perfectly.
+- One correct example by AI: When I reported that out-of-range numbers were still getting "go higher/lower" hints instead of an error, AI suggested adding range validation inside `parse_guess()` — specifically, checking whether the parsed integer falls within `[low, high]` and returning `ok=False` with an error message if not. This suggestion was correct. I verified it by asking AI to generate tests for valid, out-of-range, and non-numeric inputs, running them through the TDD cycle until all passed, and then manually testing the live app with edge cases like `0`, `150`, and `abc` to confirm the correct error messages appeared.
 
-- One misleading suggestion by AI: I told the AI that the current scoring system is incorrect and asked it to propose some scoring plans. It took me nearly half an hour to find a satisfactory solution, which I tested with TDD and then manually checked on the website. The AI took a long time to understand that I wanted a combination of the original designer's logic on the scoring algorithm, while also considering the difficulty level differences and scoring range of 0-100, as well as the number of attempts the user took to guess the secret number and whether they won or lost the game. It kept missing pieces of information I provided here and there, which was very energy-consuming. The way to fix this is to repeat the TDD cycle and manually explore the app myself from the perspective of both a correct and incorrect user.
+- One misleading suggestion by AI: When I asked AI to fix the broken scoring system, it repeatedly proposed different formulas — first an odd/even penalty system, then a pure countdown, then a difficulty-scaled version — each time missing one of my requirements: scores must stay in 0–100, wrong guesses should be visible during the game, winning must always reward more than losing, and faster wins should score higher. This was misleading because each proposal looked reasonable in isolation but broke another constraint I had stated earlier, costing nearly half an hour of back-and-forth. I verified each version by writing TDD tests that checked the score after wrong guesses, wins at different attempt counts, and the 0/100 floor/ceiling, then manually playing the game to feel whether the score feedback made intuitive sense as a player.
 
 ---
 
@@ -40,7 +40,7 @@ Answer: I first took the TDD cycle to test and refractor my code and manually ch
 
 - Describe at least one test you ran (manual or using pytest)  
   and what it showed you about your code.
-Answer: test_decimal_input_is_accepted() is used to test if the decimal number can be trimmed to the integer number. And it goes well with the current code design. 
+Answer: `test_decimal_input_is_accepted()` is used to test if the decimal number can be trimmed to the integer number. And it goes well with the current code design. 
 
 - Did AI help you design or understand any tests? How?
 Answer: I will first try to explain to AI what I want from the functions in the code. Then, I will ask AI to give me tests for wrong, right, and edge cases on the specific functions. After that, I will check if the testing achieved what I expected from the code. Finally, I used TDD to ensure all tests pass.
