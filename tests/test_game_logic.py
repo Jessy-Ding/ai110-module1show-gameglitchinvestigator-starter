@@ -267,13 +267,11 @@ def test_score_never_goes_negative():
     """Test that score never goes below 0"""
     from logic_utils import update_score
     
-    # Wrong guesses don't change score (stays at 0)
+    # Wrong guesses count down but never go below 0
     score = 0
     for i in range(1, 15):
         score = update_score(score, "Too Low", i)
         assert score >= 0, f"Score became negative ({score}) after attempt {i}"
-    
-    assert score == 0, f"Expected score to be 0 during game, got {score}"
     
     # Win very late should be 0, not negative
     late_win = update_score(0, "Win", 11)  # 100 - 100 = 0
@@ -284,13 +282,10 @@ def test_new_scoring_system():
     """Test the 0-100 scoring system"""
     from logic_utils import update_score
     
-    # Wrong guesses don't change the score
-    score = 0
-    score = update_score(score, "Too High", 1)
-    assert score == 0, "Wrong guess should not change score"
-    
-    score = update_score(score, "Too Low", 2)
-    assert score == 0, "Wrong guess should not change score"
+    # Wrong guesses show potential score for next attempt (countdown)
+    assert update_score(0, "Too High", 1) == 90, "After attempt 1 wrong: potential is 90"
+    assert update_score(0, "Too Low",  2) == 80, "After attempt 2 wrong: potential is 80"
+    assert update_score(0, "Too High", 8) == 20, "After attempt 8 wrong: potential is 20"
     
     # Win scores scale with attempts used
     assert update_score(0, "Win", 1) == 100, "Win on attempt 1 = 100"

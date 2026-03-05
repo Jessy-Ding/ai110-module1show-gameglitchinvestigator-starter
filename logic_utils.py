@@ -65,11 +65,13 @@ def update_score(current_score: int, outcome: str, attempt_number: int):
     - Win on attempt 1: 100 points
     - Each additional attempt: -10 points
     - Loss: 0 points
+    - During game: shows potential score if won on next attempt
     """
     if outcome == "Win":
         return max(0, 100 - (attempt_number - 1) * 10)
 
     if outcome in ["Too High", "Too Low"]:
-        return current_score  # Score unchanged during game, only finalized on win
+        # Show potential score for next attempt (counts down to give live feedback)
+        return max(0, 100 - attempt_number * 10)
 
     return current_score
