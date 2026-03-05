@@ -25,13 +25,33 @@ It wrote the code, ran away, and now the game is unplayable.
 
 ## 📝 Document Your Experience
 
-- [ ] Describe the game's purpose.
-- [ ] Detail which bugs you found.
-- [ ] Explain what fixes you applied.
+### 🎯 Game Purpose
+This is a number guessing game built with Streamlit. The player selects a difficulty level (Easy: 1–20, Normal: 1–100, Hard: 1–1000), then tries to guess a secret number within a limited number of attempts. After each guess, the game gives a "Too High" or "Too Low" hint. The player earns a score starting at 50 points — each wrong guess deducts 5 points, and a correct guess awards a 50-point bonus (capped at 100). The goal is to guess correctly in as few attempts as possible.
+
+### 🐛 Bugs Found
+1. **Secret number kept changing** — `random.randint()` was called directly in the script body, so every Streamlit rerun (triggered by any button click) generated a new secret number.
+2. **Backwards hints** — The "Too High" and "Too Low" messages were swapped, actively misleading the player.
+3. **Exception handler crash** — `check_guess()` compared an integer guess to a string secret number using `>` / `<`, throwing a `TypeError` instead of returning a hint.
+4. **No range validation** — Out-of-range inputs (e.g., `0` or `150` on Normal mode) were silently accepted and given directional hints instead of an error.
+5. **Attempt counter not updating** — The attempts display in the debug panel did not reflect the current count because Streamlit's rerun wiped the intermediate state before it could render.
+6. **New Game button broken** — Clicking "New Game" did not reset the game state or generate a new secret number.
+7. **Broken scoring system** — The original scoring logic did not keep scores in the 0–100 range and gave no live feedback during the game.
+8. **Hard difficulty unbalanced** — Hard mode originally allowed only 5 attempts for a 1–1000 range, making it statistically near-impossible to win.
+
+### 🔧 Fixes Applied
+1. **Stable secret number** — Wrapped `random.randint()` in a session state guard (`if "secret" not in st.session_state`) so it only runs once on the first load.
+2. **Corrected hints** — Swapped the "Too High" / "Too Low" return values in `check_guess()` to match the correct logic.
+3. **Safe comparison** — Added a `try/except` block in `check_guess()` with a string-based fallback comparison to prevent `TypeError` crashes.
+4. **Range validation** — Added bounds checking in `parse_guess()` that returns `ok=False` with a clear error message for out-of-range inputs.
+5. **UI sync with `st.rerun()`** — After a valid guess, the hint is stored in `st.session_state.current_hint` and `st.rerun()` is called so the updated attempt count and hint render correctly on the next frame.
+6. **Form-based input** — Wrapped the guess input and submit button in `st.form(clear_on_submit=True)` to prevent Streamlit's double-rerun from swallowing valid submissions.
+7. **New Game reset** — The "New Game" button now deletes all relevant session state keys, forcing a clean reinitialisation on the next rerun.
+8. **Redesigned scoring** — Score starts at 50, loses 5 per wrong guess (floor 0), and gains 50 on a win (cap 100), keeping all scores in the 0–100 range with live feedback.
+9. **Balanced difficulty** — Attempt limits updated to Easy: 6, Normal: 8, Hard: 11 (optimal binary search on 1–1000 requires ~10 guesses).
 
 ## 📸 Demo
 
-- [ ] [Insert a screenshot of your fixed, winning game here]
+![alt text](image.png)
 
 ## 🚀 Stretch Features
 
